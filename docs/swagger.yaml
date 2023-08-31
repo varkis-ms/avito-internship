@@ -1,0 +1,246 @@
+basePath: /api/v1
+definitions:
+  avito_task_internal_entity.ReportUserHistory:
+    properties:
+      date:
+        type: string
+      operation:
+        type: string
+      segment:
+        type: string
+      user_id:
+        type: string
+    required:
+    - date
+    - operation
+    - segment
+    - user_id
+    type: object
+  avito_task_internal_entity.SegmentRequest:
+    properties:
+      percent:
+        example: 0.5
+        type: number
+      segment:
+        example: AVITO_VOICE_MESSAGES
+        type: string
+    required:
+    - segment
+    type: object
+  avito_task_internal_entity.UserAddToSegmentRequest:
+    properties:
+      segments:
+        example:
+        - AVITO_VOICE_MESSAGES
+        - AVITO_PERFORMANCE_VAS
+        items:
+          type: string
+        type: array
+      ttl:
+        example: 2
+        type: integer
+      user_id:
+        example: 1000
+        type: integer
+    required:
+    - segments
+    - user_id
+    type: object
+  avito_task_internal_entity.UserRemoveFromSegmentRequest:
+    properties:
+      segments:
+        example:
+        - AVITO_VOICE_MESSAGES
+        - AVITO_PERFORMANCE_VAS
+        items:
+          type: string
+        type: array
+      user_id:
+        example: 1000
+        type: integer
+    required:
+    - segments
+    - user_id
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: markin-2002@yandex.ru
+    name: Markin Sergey
+  title: Dynamic user segmentation service
+  version: "1.0"
+paths:
+  /report/:
+    get:
+      parameters:
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: year
+        in: query
+        name: year
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/avito_task_internal_entity.ReportUserHistory'
+            type: array
+      summary: Get history JSON
+      tags:
+      - report
+  /report/file:
+    get:
+      parameters:
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: year
+        in: query
+        name: year
+        required: true
+        type: string
+      produces:
+      - text/csv
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+      summary: Get report file
+      tags:
+      - report
+  /report/link:
+    get:
+      parameters:
+      - description: month
+        in: query
+        name: month
+        required: true
+        type: string
+      - description: year
+        in: query
+        name: year
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get report file
+      tags:
+      - report
+  /segment/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/avito_task_internal_entity.SegmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+      summary: Create segment
+      tags:
+      - segment
+  /segment/delete:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/avito_task_internal_entity.SegmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Delete segment
+      tags:
+      - segment
+  /user/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/avito_task_internal_entity.UserAddToSegmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Add user to segment
+      tags:
+      - user
+  /user/get:
+    get:
+      parameters:
+      - description: user_id
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                type: string
+              type: array
+            type: object
+      summary: Get active user's segments
+      tags:
+      - user
+  /user/remove:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/avito_task_internal_entity.UserRemoveFromSegmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Remove user from segment
+      tags:
+      - user
+swagger: "2.0"

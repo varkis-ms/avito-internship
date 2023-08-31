@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  postgres_db:
+    container_name: segment_service_postgres
+    image: postgres
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    volumes:
+      - ./migrate/1_init_db.sql:/docker-entrypoint-initdb.d/structer.sql
+
+  service:
+    container_name: Dynamic_user_segmentation_service
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    depends_on:
+      - postgres_db
+    restart: unless-stopped
